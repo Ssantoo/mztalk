@@ -23,6 +23,9 @@ public interface AuctionService {
 
     BoardPriceDto updatePrice(BoardPriceDto boardPriceDto);
 
+    @org.springframework.transaction.annotation.Transactional
+    void priceUpdate(Long priceId, Integer currentPrice);
+
     int updateCount(Long bId, Long writer);
 
     ConcurrentHashMap<String, String> getRecentBoardNo();

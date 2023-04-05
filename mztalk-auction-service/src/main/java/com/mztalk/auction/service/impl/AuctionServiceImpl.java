@@ -16,7 +16,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,11 +25,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import javax.transaction.Transactional;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,7 +36,6 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -162,6 +159,18 @@ public class AuctionServiceImpl implements AuctionService {
         priceRepository.save(price);
         return boardPriceDto;
     }
+
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public void priceUpdate(Long priceId, Integer currentPrice){
+        Price nowPrice = priceRepository.findByIdWithPessimisticLock(priceId);
+        nowPrice.increase(currentPrice);
+        priceRepository.saveAndFlush(nowPrice);
+    }
+
+
+
 
     //조회수
     @Override
